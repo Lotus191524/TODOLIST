@@ -17,7 +17,8 @@
         <button id="clearAllBtn">Clear All</button>
     </div>
 
-    <script src="script.js">const taskInput = document.getElementById('taskInput');
+  <script>
+const taskInput = document.getElementById('taskInput');
 const addTaskBtn = document.getElementById('addTaskBtn');
 const taskList = document.getElementById('taskList');
 const clearAllBtn = document.getElementById('clearAllBtn');
@@ -27,26 +28,32 @@ let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
 // Render tasks
 function renderTasks() {
     taskList.innerHTML = '';
+
     tasks.forEach((task, index) => {
         const li = document.createElement('li');
         li.textContent = task.text;
+        li.classList.add("fade-in");
+
         if (task.completed) li.classList.add('completed');
 
-        // Toggle completed on click
         li.addEventListener('click', () => {
             tasks[index].completed = !tasks[index].completed;
+            li.classList.add("pop");
             saveTasks();
-            renderTasks();
+            setTimeout(() => renderTasks(), 200);
         });
 
-        // Delete button
         const delBtn = document.createElement('button');
         delBtn.textContent = 'X';
         delBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            tasks.splice(index, 1);
-            saveTasks();
-            renderTasks();
+            li.classList.add("fade-out");
+
+            setTimeout(() => {
+                tasks.splice(index, 1);
+                saveTasks();
+                renderTasks();
+            }, 400);
         });
 
         li.appendChild(delBtn);
@@ -54,12 +61,10 @@ function renderTasks() {
     });
 }
 
-// Save tasks to localStorage
 function saveTasks() {
     localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 
-// Add new task
 addTaskBtn.addEventListener('click', () => {
     const taskText = taskInput.value.trim();
     if (taskText) {
@@ -70,21 +75,21 @@ addTaskBtn.addEventListener('click', () => {
     }
 });
 
-// Clear all tasks
 clearAllBtn.addEventListener('click', () => {
-    tasks = [];
-    saveTasks();
-    renderTasks();
+    const allItems = document.querySelectorAll("li");
+    allItems.forEach((item, i) => {
+        setTimeout(() => {
+            item.classList.add("fade-out");
+        }, i * 80);
+    });
+
+    setTimeout(() => {
+        tasks = [];
+        saveTasks();
+        renderTasks();
+    }, allItems.length * 80 + 400);
 });
 
-// Initial render
+// First load
 renderTasks();
 </script>
-</body>
-</html>
-
-
-
-
-
-
